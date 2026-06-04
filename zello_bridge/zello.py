@@ -112,7 +112,7 @@ class ZelloController:
 			try:
 				issuer_id_path = os.environ['ZELLO_ISSUER_ID']
 				with open(issuer_id_path, 'rb') as i:
-					self._issuer_id = i.read()
+					self._issuer_id = i.read().decode('utf-8').strip()
 			except KeyError:
 				self._logger.error("Environment variable 'ZELLO_ISSUER_ID' not set. Cannot load issuer ID.")
 				return None
