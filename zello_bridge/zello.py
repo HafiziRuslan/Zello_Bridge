@@ -193,6 +193,8 @@ class ZelloController:
 			'username': os.environ.get('ZELLO_USERNAME'),
 			'password': os.environ.get('ZELLO_PASSWORD'),
 			'channels': [os.environ.get('ZELLO_CHANNEL')],
+			'platform_type': 'gateway',
+			'platform_name': 'radio gateway',
 		}
 		self._auth_in_progress = True
 		self._auth_started_at = time.monotonic()
