@@ -55,6 +55,7 @@ class ZelloController:
 		self._shutdown = False
 		self._pkt_id = 0
 		self._private_key = None
+		self._issuer_id = None
 		self._woodpecker_until = None
 		self._empty_msg_backoff_until = None
 		self._ptt_down_at = None
@@ -84,30 +85,62 @@ class ZelloController:
 		return seq
 
 	async def get_token(self):
-		if 'ZELLO_PRIVATE_KEY' in os.environ:
-			self._logger.info('Private key detected, getting Zello Free token')
+		if 'ZELLO_PRIVATE_KEY' in os.environ and 'ZELLO_ISSUER_ID' in os.environ:
+			self._logger.info('Issuer and Private key detected, getting Zello Free token')
 			return self.get_token_free()
 		return None
 
 	def load_private_key(self):
 		if self._private_key is None:
-			with open(os.environ['ZELLO_PRIVATE_KEY'], 'rb') as f:
-				self._private_key = f.read()
+			try:
+				private_key_path = os.environ['ZELLO_PRIVATE_KEY']
+				with open(private_key_path, 'rb') as k:
+					self._private_key = k.read()
+			except KeyError:
+				self._logger.error("Environment variable 'ZELLO_PRIVATE_KEY' not set. Cannot load private key.")
+				return None
+			except FileNotFoundError:
+				self._logger.error(f"Private key file not found at path: '{private_key_path}'.")
+				return None
+			except Exception as e:
+				self._logger.error(f"Unexpected error loading private key from '{private_key_path}': {e}")
+				return None
 		return self._private_key
 
 	def load_issuer_id(self):
 		if self._issuer_id is None:
-			with open(os.environ['ZELLO_ISSUER_ID'], 'rb') as f:
-				self._issuer_id = f.read()
+			try:
+				issuer_id_path = os.environ['ZELLO_ISSUER_ID']
+				with open(issuer_id_path, 'rb') as i:
+					self._issuer_id = i.read()
+			except KeyError:
+				self._logger.error("Environment variable 'ZELLO_ISSUER_ID' not set. Cannot load issuer ID.")
+				return None
+			except FileNotFoundError:
+				self._logger.error(f"Issuer ID file not found at path: '{issuer_id_path}'.")
+				return None
+			except Exception as e:
+				self._logger.error(f"Unexpected error loading issuer ID from '{issuer_id_path}': {e}")
+				return None
 		return self._issuer_id
 
 	def get_token_free(self):
 		expiry = datetime.now(timezone.utc) + timedelta(seconds=AUTH_TOKEN_EXPIRY)
 		key = self.load_private_key()
+		if key is None:
+			self._logger.error('Cannot generate Zello Free token: Private key is missing.')
+			return None
 		issuer = self.load_issuer_id()
-		token = jwt.encode({'iss': issuer, 'exp': int(expiry.timestamp())}, key, algorithm='RS256')
-		self._token_expiry = expiry
-		return token
+		if issuer is None:
+			self._logger.error('Cannot generate Zello Free token: Issuer ID is missing.')
+			return None
+		try:
+			token = jwt.encode({'iss': issuer, 'exp': int(expiry.timestamp())}, key, algorithm='RS256')
+			self._token_expiry = expiry
+			return token
+		except Exception as e:
+			self._logger.error(f'Failed to encode JWT token with provided key/issuer: {e}')
+			return None
 
 	def _redact(self, obj):
 		try:
