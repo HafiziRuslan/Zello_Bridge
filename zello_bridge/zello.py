@@ -95,10 +95,17 @@ class ZelloController:
 				self._private_key = f.read()
 		return self._private_key
 
+	def load_issuer_id(self):
+		if self._issuer_id is None:
+			with open(os.environ['ZELLO_ISSUER_ID'], 'rb') as f:
+				self._issuer_id = f.read()
+		return self._issuer_id
+
 	def get_token_free(self):
 		expiry = datetime.now(timezone.utc) + timedelta(seconds=AUTH_TOKEN_EXPIRY)
 		key = self.load_private_key()
-		token = jwt.encode({'iss': os.environ.get('ZELLO_ISSUER', ''), 'exp': int(expiry.timestamp())}, key, algorithm='RS256')
+		issuer = self.load_issuer_id()
+		token = jwt.encode({'iss': issuer, 'exp': int(expiry.timestamp())}, key, algorithm='RS256')
 		self._token_expiry = expiry
 		return token
 

@@ -150,7 +150,7 @@ Environment=ZELLO_CHANNEL="My Test Channel"
 
 # Zello Free variables
 Environment=ZELLO_PRIVATE_KEY=/opt/Zello_Bridge/zello.key
-Environment=ZELLO_ISSUER=my-issuer-id
+Environment=ZELLO_ISSUER_ID=/opt/Zello_Bridge/zello.id
 Environment=ZELLO_WS_ENDPOINT=wss://zello.io/ws
 ```
 
