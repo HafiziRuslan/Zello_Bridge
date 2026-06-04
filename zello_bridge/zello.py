@@ -153,7 +153,7 @@ class ZelloController:
 				if k == 'password':
 					data[k] = '<redacted>'
 				else:
-					data[k] = val[:12] + '…<redacted>'
+					data[k] = val[:12] + '...<redacted>'
 		return data
 
 	def _debug_skip(self, reason):
