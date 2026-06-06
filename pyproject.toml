@@ -2,7 +2,7 @@
 [project]
 name = 'Zello_Bridge'
 version = '0.0.2a2'
-requires-python = '>=3.10'
+requires-python = '>=3.11'
 authors = [
   { name = 'Matt G4IYT', email = 'matt@g4iyt.uk' },
   { name = 'Hafizi 9W2LGX', email = '9w2lgx@mhrtech.my' },
