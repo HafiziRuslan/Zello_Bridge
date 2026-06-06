@@ -151,9 +151,9 @@ class ZelloController:
 			if k in data and data[k] is not None:
 				val = str(data[k])
 				if k == 'password':
-					data[k] = '<redacted>'
+					data[k] = val[0] + '*' * (len(val) - 2) + val[-1]
 				else:
-					data[k] = val[:12] + '...<redacted>'
+					data[k] = val[:10] + '*' * (len(val) - 2) + val[:-2]
 		return data
 
 	def _debug_skip(self, reason):
