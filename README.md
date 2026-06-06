@@ -200,6 +200,49 @@ sudo systemctl enable zello_bridge
 sudo systemctl start zello_bridge
 ```
 
+## Updating
+
+To update the bridge to the latest version and clean the environment:
+
+1. **Stop the service:**
+
+    ```bash
+    sudo systemctl stop zello_bridge
+    ```
+
+2. **Reset the repository:**
+
+    ```bash
+    git fetch --all
+    git reset --hard origin/$(git symbolic-ref --short HEAD)
+    ```
+
+3. **Clean environment and cache:**
+
+    ```bash
+    rm -rf .venv
+    find . -type d -name "__pycache__" -exec rm -rf {} +
+    ```
+
+    or use uv
+
+    ```bash
+    uv tool run pyclean . --debris
+    uv venv --clear
+    ```
+
+4. **Rebuild and Sync:**
+
+    ```bash
+    uv sync
+    ```
+
+5. **Restart the service:**
+
+    ```bash
+    sudo systemctl start zello_bridge
+    ```
+
 ---
 
 ## AllStarLink Setup
