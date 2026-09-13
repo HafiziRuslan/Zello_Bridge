@@ -2,21 +2,21 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
   "version": 1,
-  "serialNumber": "urn:uuid:7d38c00f-ecc6-497f-ae55-075b9d4e816e",
+  "serialNumber": "urn:uuid:1dbebd37-9bdd-428d-8875-668a863be068",
   "metadata": {
-    "timestamp": "2026-06-06T17:28:48.785357100Z",
+    "timestamp": "2026-09-13T16:36:45.536705400Z",
     "tools": [
       {
         "vendor": "Astral Software Inc.",
         "name": "uv",
-        "version": "0.11.19"
+        "version": "0.12.13"
       }
     ],
     "component": {
       "type": "library",
-      "bom-ref": "zello-bridge-1@0.0.2a2",
+      "bom-ref": "zello-bridge-1@0.0.2a3",
       "name": "zello-bridge",
-      "version": "0.0.2a2",
+      "version": "0.0.2a3",
       "properties": [
         {
           "name": "uv:package:is_project_root",
@@ -28,17 +28,17 @@
   "components": [
     {
       "type": "library",
-      "bom-ref": "aiohappyeyeballs-2@2.6.2",
+      "bom-ref": "aiohappyeyeballs-2@2.7.1",
       "name": "aiohappyeyeballs",
-      "version": "2.6.2",
-      "purl": "pkg:pypi/aiohappyeyeballs@2.6.2"
+      "version": "2.7.1",
+      "purl": "pkg:pypi/aiohappyeyeballs@2.7.1"
     },
     {
       "type": "library",
-      "bom-ref": "aiohttp-3@3.14.0",
+      "bom-ref": "aiohttp-3@3.14.3",
       "name": "aiohttp",
-      "version": "3.14.0",
-      "purl": "pkg:pypi/aiohttp@3.14.0"
+      "version": "3.14.3",
+      "purl": "pkg:pypi/aiohttp@3.14.3"
     },
     {
       "type": "library",
@@ -56,10 +56,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "cffi-6@2.0.0",
+      "bom-ref": "cffi-6@2.1.1",
       "name": "cffi",
-      "version": "2.0.0",
-      "purl": "pkg:pypi/cffi@2.0.0",
+      "version": "2.1.1",
+      "purl": "pkg:pypi/cffi@2.1.1",
       "properties": [
         {
           "name": "uv:package:marker",
@@ -69,10 +69,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "cryptography-7@48.0.0",
+      "bom-ref": "cryptography-7@50.0.1",
       "name": "cryptography",
-      "version": "48.0.0",
-      "purl": "pkg:pypi/cryptography@48.0.0"
+      "version": "50.0.1",
+      "purl": "pkg:pypi/cryptography@50.0.1"
     },
     {
       "type": "library",
@@ -83,17 +83,17 @@
     },
     {
       "type": "library",
-      "bom-ref": "idna-9@3.18",
+      "bom-ref": "idna-9@3.19",
       "name": "idna",
-      "version": "3.18",
-      "purl": "pkg:pypi/idna@3.18"
+      "version": "3.19",
+      "purl": "pkg:pypi/idna@3.19"
     },
     {
       "type": "library",
-      "bom-ref": "multidict-10@6.7.1",
+      "bom-ref": "multidict-10@6.8.0",
       "name": "multidict",
-      "version": "6.7.1",
-      "purl": "pkg:pypi/multidict@6.7.1"
+      "version": "6.8.0",
+      "purl": "pkg:pypi/multidict@6.8.0"
     },
     {
       "type": "library",
@@ -117,10 +117,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "pyjwt-13@2.13.0",
+      "bom-ref": "pyjwt-13@2.14.0",
       "name": "pyjwt",
-      "version": "2.13.0",
-      "purl": "pkg:pypi/pyjwt@2.13.0"
+      "version": "2.14.0",
+      "purl": "pkg:pypi/pyjwt@2.14.0"
     },
     {
       "type": "library",
@@ -131,10 +131,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "typing-extensions-15@4.15.0",
+      "bom-ref": "typing-extensions-15@4.16.0",
       "name": "typing-extensions",
-      "version": "4.15.0",
-      "purl": "pkg:pypi/typing-extensions@4.15.0",
+      "version": "4.16.0",
+      "purl": "pkg:pypi/typing-extensions@4.16.0",
       "properties": [
         {
           "name": "uv:package:marker",
@@ -144,59 +144,59 @@
     },
     {
       "type": "library",
-      "bom-ref": "yarl-16@1.24.2",
+      "bom-ref": "yarl-16@1.24.5",
       "name": "yarl",
-      "version": "1.24.2",
-      "purl": "pkg:pypi/yarl@1.24.2"
+      "version": "1.24.5",
+      "purl": "pkg:pypi/yarl@1.24.5"
     }
   ],
   "dependencies": [
     {
-      "ref": "aiohappyeyeballs-2@2.6.2"
+      "ref": "aiohappyeyeballs-2@2.7.1"
     },
     {
-      "ref": "aiohttp-3@3.14.0",
+      "ref": "aiohttp-3@3.14.3",
       "dependsOn": [
-        "aiohappyeyeballs-2@2.6.2",
+        "aiohappyeyeballs-2@2.7.1",
         "aiosignal-4@1.4.0",
         "attrs-5@26.1.0",
         "frozenlist-8@1.8.0",
-        "multidict-10@6.7.1",
+        "multidict-10@6.8.0",
         "propcache-11@0.5.2",
-        "typing-extensions-15@4.15.0",
-        "yarl-16@1.24.2"
+        "typing-extensions-15@4.16.0",
+        "yarl-16@1.24.5"
       ]
     },
     {
       "ref": "aiosignal-4@1.4.0",
       "dependsOn": [
         "frozenlist-8@1.8.0",
-        "typing-extensions-15@4.15.0"
+        "typing-extensions-15@4.16.0"
       ]
     },
     {
       "ref": "attrs-5@26.1.0"
     },
     {
-      "ref": "cffi-6@2.0.0",
+      "ref": "cffi-6@2.1.1",
       "dependsOn": [
         "pycparser-12@3.0"
       ]
     },
     {
-      "ref": "cryptography-7@48.0.0",
+      "ref": "cryptography-7@50.0.1",
       "dependsOn": [
-        "cffi-6@2.0.0"
+        "cffi-6@2.1.1"
       ]
     },
     {
       "ref": "frozenlist-8@1.8.0"
     },
     {
-      "ref": "idna-9@3.18"
+      "ref": "idna-9@3.19"
     },
     {
-      "ref": "multidict-10@6.7.1"
+      "ref": "multidict-10@6.8.0"
     },
     {
       "ref": "propcache-11@0.5.2"
@@ -205,28 +205,28 @@
       "ref": "pycparser-12@3.0"
     },
     {
-      "ref": "pyjwt-13@2.13.0"
+      "ref": "pyjwt-13@2.14.0"
     },
     {
       "ref": "pyogg-14@0.7"
     },
     {
-      "ref": "typing-extensions-15@4.15.0"
+      "ref": "typing-extensions-15@4.16.0"
     },
     {
-      "ref": "yarl-16@1.24.2",
+      "ref": "yarl-16@1.24.5",
       "dependsOn": [
-        "idna-9@3.18",
-        "multidict-10@6.7.1",
+        "idna-9@3.19",
+        "multidict-10@6.8.0",
         "propcache-11@0.5.2"
       ]
     },
     {
-      "ref": "zello-bridge-1@0.0.2a2",
+      "ref": "zello-bridge-1@0.0.2a3",
       "dependsOn": [
-        "aiohttp-3@3.14.0",
-        "cryptography-7@48.0.0",
-        "pyjwt-13@2.13.0",
+        "aiohttp-3@3.14.3",
+        "cryptography-7@50.0.1",
+        "pyjwt-13@2.14.0",
         "pyogg-14@0.7"
       ]
     }
