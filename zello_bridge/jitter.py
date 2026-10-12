@@ -89,7 +89,7 @@ class PlayoutPolicy:
 	# ------------------------------------------------------------------ statistics
 	@property
 	def latency_ms(self):
-		"""目前緩衝代表的延遲量（供測試/日誌用）。"""
+		"""The amount of latency currently represented by the buffer (for testing/logging purposes)."""
 		return self.silence_frames * FRAME_INTERVAL_S * 1000.0
 
 	def summary(self):
