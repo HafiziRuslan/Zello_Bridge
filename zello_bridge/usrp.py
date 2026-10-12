@@ -9,8 +9,8 @@ from .jitter import PlayoutPolicy
 USRP_FRAME_SIZE = 352
 USRP_HEADER_SIZE = 32
 USRP_VOICE_SIZE = USRP_FRAME_SIZE - USRP_HEADER_SIZE
-USRP_FRAME_INTERVAL = 0.02                 # 20ms slin frame (160 samples @ 8kHz)
-SILENCE_PCM = bytes(USRP_VOICE_SIZE)   # 20ms of slin silence: keeps chan_usrp keyed on underrun
+USRP_FRAME_INTERVAL = 0.02  # 20ms slin frame (160 samples @ 8kHz)
+SILENCE_PCM = bytes(USRP_VOICE_SIZE)  # 20ms of slin silence: keeps chan_usrp keyed on underrun
 USRP_GAIN_RX_DB = int(os.environ.get('USRP_GAIN_RX_DB', 0))
 USRP_GAIN_TX_DB = int(os.environ.get('USRP_GAIN_TX_DB', 0))
 USRP_TYPE_VOICE = 0
@@ -102,7 +102,7 @@ class USRPController(asyncio.DatagramProtocol):
 			self._transport.sendto(frame, (self._tx_address, self._tx_port))
 
 	async def _tx_silence(self):
-		# 播放時間軸不中斷：緩衝空時補靜音，避免 chan_usrp 在發話中途 unkey
+		# The playback timeline is not interrupted: silence is added when the buffer is empty to prevent chan_usrp from being unkeyed mid-sentence.
 		await self._tx_frame(SILENCE_PCM)
 
 	async def run_tx(self):
@@ -112,7 +112,7 @@ class USRPController(asyncio.DatagramProtocol):
 		started = False
 		while True:
 			if not self._zello_ptt.is_set():
-				# 先排空尾巴，避免放開 PTT 時砍掉最後一句話
+				# Empty the tail first to avoid cutting off the last sentence when releasing PTT
 				if started:
 					drained = 0
 					while drained < policy.tail_drain_bytes:
@@ -134,7 +134,7 @@ class USRPController(asyncio.DatagramProtocol):
 				await self._zello_ptt.wait()
 				continue
 
-			# 本輪第一幀音訊到達前不送任何東西
+			# Don’t send anything before the first frame of this round arrives.
 			if not started:
 				if await self._stream_in.pending() < USRP_VOICE_SIZE:
 					await asyncio.sleep(USRP_FRAME_INTERVAL)
@@ -153,8 +153,7 @@ class USRPController(asyncio.DatagramProtocol):
 			if pending > policy.max_latency_bytes:
 				dropped = await self._stream_in.discard(keep_bytes=policy.target_bytes)
 				policy.note_dropped(dropped)
-				self._logger.warning(
-					f'Playout latency bound hit, dropped {dropped} bytes of stale audio')
+				self._logger.warning(f'Playout latency bound hit, dropped {dropped} bytes of stale audio')
 				pending = await self._stream_in.pending()
 
 			if pending >= USRP_VOICE_SIZE:

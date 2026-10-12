@@ -29,12 +29,12 @@ class AsyncByteStream:
 			await self._data_available.wait()
 
 	async def pending(self) -> int:
-		"""回傳緩衝區中尚未被讀取的位元組數。"""
+		"""Returns the number of bytes in the buffer that have not yet been read."""
 		async with self._lock:
 			return len(self._buffer.getvalue())
 
 	async def discard(self, keep_bytes: int = 0) -> int:
-		"""丟棄緩衝內容，只保留最後 keep_bytes 位元組；回傳被丟棄的位元組數。"""
+		"""Discard the buffer contents, retaining only the last keep_bytes bytes; return the number of discarded bytes."""
 		async with self._lock:
 			self._buffer.seek(0)
 			data = self._buffer.read()
