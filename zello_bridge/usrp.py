@@ -4,10 +4,13 @@ import math
 import os
 import struct
 from .stream import AsyncByteStream
+from .jitter import PlayoutPolicy
 
 USRP_FRAME_SIZE = 352
 USRP_HEADER_SIZE = 32
 USRP_VOICE_SIZE = USRP_FRAME_SIZE - USRP_HEADER_SIZE
+USRP_FRAME_INTERVAL = 0.02                 # 20ms slin frame (160 samples @ 8kHz)
+SILENCE_PCM = bytes(USRP_VOICE_SIZE)   # 20ms of slin silence: keeps chan_usrp keyed on underrun
 USRP_GAIN_RX_DB = int(os.environ.get('USRP_GAIN_RX_DB', 0))
 USRP_GAIN_TX_DB = int(os.environ.get('USRP_GAIN_TX_DB', 0))
 USRP_TYPE_VOICE = 0
@@ -98,16 +101,68 @@ class USRPController(asyncio.DatagramProtocol):
 		if self._transport is not None:
 			self._transport.sendto(frame, (self._tx_address, self._tx_port))
 
+	async def _tx_silence(self):
+		# 播放時間軸不中斷：緩衝空時補靜音，避免 chan_usrp 在發話中途 unkey
+		await self._tx_frame(SILENCE_PCM)
+
 	async def run_tx(self):
+		loop = asyncio.get_running_loop()
+		policy = PlayoutPolicy(self._logger)
+		next_at = None
+		started = False
 		while True:
-			# Send PTT off packet if Zello PTT is off
 			if not self._zello_ptt.is_set():
+				# 先排空尾巴，避免放開 PTT 時砍掉最後一句話
+				if started:
+					drained = 0
+					while drained < policy.tail_drain_bytes:
+						if await self._stream_in.pending() < USRP_VOICE_SIZE:
+							break
+						pcm = await self._stream_in.read(USRP_VOICE_SIZE)
+						if len(pcm) != USRP_VOICE_SIZE:
+							break
+						policy.note_played(tail=True)
+						await self._tx_frame(pcm)
+						drained += USRP_VOICE_SIZE
+						await asyncio.sleep(USRP_FRAME_INTERVAL)
+					flushed = await self._stream_in.discard()
+					self._logger.info(f'Playout done: {policy.summary()} flushed={flushed}B')
+					next_at = None
+					started = False
+					policy.reset_message()
 				await self._tx_off()
-			# Wait for Zello PTT
-			await self._zello_ptt.wait()
-			try:
-				pcm = await asyncio.wait_for(self._stream_in.read(USRP_VOICE_SIZE), timeout=0.1)
-				if len(pcm) > 0:
+				await self._zello_ptt.wait()
+				continue
+
+			# 本輪第一幀音訊到達前不送任何東西
+			if not started:
+				if await self._stream_in.pending() < USRP_VOICE_SIZE:
+					await asyncio.sleep(USRP_FRAME_INTERVAL)
+					continue
+				started = True
+				next_at = loop.time()
+
+			now = loop.time()
+			if next_at > now:
+				await asyncio.sleep(next_at - now)
+			elif now - next_at > 0.5:
+				next_at = now
+			next_at += USRP_FRAME_INTERVAL
+
+			pending = await self._stream_in.pending()
+			if pending > policy.max_latency_bytes:
+				dropped = await self._stream_in.discard(keep_bytes=policy.target_bytes)
+				policy.note_dropped(dropped)
+				self._logger.warning(
+					f'Playout latency bound hit, dropped {dropped} bytes of stale audio')
+				pending = await self._stream_in.pending()
+
+			if pending >= USRP_VOICE_SIZE:
+				pcm = await self._stream_in.read(USRP_VOICE_SIZE)
+				if len(pcm) == USRP_VOICE_SIZE:
+					policy.note_played()
 					await self._tx_frame(pcm)
-			except asyncio.TimeoutError:
-				pass
+					continue
+
+			policy.note_starved()
+			await self._tx_silence()
