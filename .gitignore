@@ -220,3 +220,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/linux,python,windows
+
+# Added by ggshield
+.cache_ggshield
