@@ -3,8 +3,9 @@ import logging
 import math
 import os
 import struct
-from .stream import AsyncByteStream
+
 from .jitter import PlayoutPolicy
+from .stream import AsyncByteStream
 
 USRP_FRAME_SIZE = 352
 USRP_HEADER_SIZE = 32
@@ -133,7 +134,6 @@ class USRPController(asyncio.DatagramProtocol):
 				await self._tx_off()
 				await self._zello_ptt.wait()
 				continue
-
 			# Don’t send anything before the first frame of this round arrives.
 			if not started:
 				if await self._stream_in.pending() < USRP_VOICE_SIZE:
@@ -141,27 +141,23 @@ class USRPController(asyncio.DatagramProtocol):
 					continue
 				started = True
 				next_at = loop.time()
-
 			now = loop.time()
 			if next_at > now:
 				await asyncio.sleep(next_at - now)
 			elif now - next_at > 0.5:
 				next_at = now
 			next_at += USRP_FRAME_INTERVAL
-
 			pending = await self._stream_in.pending()
 			if pending > policy.max_latency_bytes:
 				dropped = await self._stream_in.discard(keep_bytes=policy.target_bytes)
 				policy.note_dropped(dropped)
 				self._logger.warning(f'Playout latency bound hit, dropped {dropped} bytes of stale audio')
 				pending = await self._stream_in.pending()
-
 			if pending >= USRP_VOICE_SIZE:
 				pcm = await self._stream_in.read(USRP_VOICE_SIZE)
 				if len(pcm) == USRP_VOICE_SIZE:
 					policy.note_played()
 					await self._tx_frame(pcm)
 					continue
-
 			policy.note_starved()
 			await self._tx_silence()
