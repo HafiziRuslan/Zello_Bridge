@@ -29,10 +29,7 @@ The bridge does not require significant resources. The FreeSTAR bridge runs on a
   * [Install with uv](#install-with-uv)
   * [Docker](#docker)
 * [Setup Service](#setup-service)
-  * [Common Parameters](#common-parameters-used-in-both-free-and-work)
-  * [Zello Free Example](#zello-free-example)
-  * [Zello Work Example](#zello-work-example)
-  * [Optional Parameters](#optional-parameters)
+  * [Create .env File](#create-env-file)
   * [Enable and Start Service](#enable-and-start-service)
 * [AllStarLink Setup](#allstarlink-setup)
   * [Configure `rpt.conf`](#configure-rptconf)
@@ -96,106 +93,39 @@ uv sync
 
 ## Setup Service
 
-Adjust `zello_bridge` to point to where the script is installed:
+```bash
+sudo cp zello_bridge.service /etc/systemd/system/zello_bridge.service
+```
+
+The service file is configured to load environment variables from a `.env` file. Create this file at `/opt/Zello_Bridge/.env` with your configuration.
+
+### Create .env File
 
 ```bash
-sudo ln -s /opt/Zello_Bridge/zello_bridge.service /usr/lib/systemd/system/
-sudo systemctl edit zello_bridge
+sudo nano /opt/Zello_Bridge/.env
 ```
 
-When the editor opens, set environment variables under `[Service]`.
-
-### Common Parameters (used in both Free and Work)
+The file should contain the following lines:
 
 ```ini
-[Service]
-# IP where this program listens for USRP RX audio (usually localhost)
-Environment=USRP_BIND=127.0.0.1
+USRP_BIND=127.0.0.1
+USRP_HOST=127.0.0.1
+USRP_RXPORT=34001
+USRP_TXPORT=32001
 
-# IP where this program sends USRP TX audio (usually localhost)
-Environment=USRP_HOST=127.0.0.1
+ZELLO_USERNAME=myuser
+ZELLO_PASSWORD=mypass
+ZELLO_CHANNEL="My Test Channel"
 
-# UDP port for audio received from USRP/AllStarLink
-# 34001 is ASL default (rxchannel = USRP/127.0.0.1:34001:32001)
-Environment=USRP_RXPORT=34001
-
-# UDP port for audio sent back into USRP/AllStarLink
-# 32001 is ASL default
-Environment=USRP_TXPORT=32001
-
-# Zello username (case-sensitive)
-Environment=ZELLO_USERNAME=myuser
-
-# Zello password
-Environment=ZELLO_PASSWORD=mypass
-
-# Zello channel name (must match exactly, case-sensitive)
-Environment=ZELLO_CHANNEL="My Test Channel"
-```
-
-### Zello Free Example
-
-```ini
-[Service]
-# USRP parameters
-Environment=USRP_BIND=127.0.0.1
-Environment=USRP_HOST=127.0.0.1
-Environment=USRP_RXPORT=34001
-Environment=USRP_TXPORT=32001
-
-# Zello credentials
-Environment=ZELLO_USERNAME=myuser
-Environment=ZELLO_PASSWORD=mypass
-Environment=ZELLO_CHANNEL="My Test Channel"
-
-# Zello Free variables
-Environment=ZELLO_PRIVATE_KEY=/opt/Zello_Bridge/zello.key
-Environment=ZELLO_ISSUER_ID=/opt/Zello_Bridge/zello.id
-Environment=ZELLO_WS_ENDPOINT=wss://zello.io/ws
-```
-
-### Zello Work Example
-
-```ini
-[Service]
-# USRP parameters
-Environment=USRP_BIND=127.0.0.1
-Environment=USRP_HOST=127.0.0.1
-Environment=USRP_RXPORT=34001
-Environment=USRP_TXPORT=32001
-
-# Zello credentials
-Environment=ZELLO_USERNAME=myuser
-Environment=ZELLO_PASSWORD=mypass
-Environment=ZELLO_CHANNEL="My Test Channel"
-
-# Zello Work variables
-Environment=ZELLO_API_ENDPOINT=https://mynetwork.zellowork.com
-Environment=ZELLO_WS_ENDPOINT=wss://zellowork.io/ws/mynetwork
-```
-
-### Optional Parameters
-
-```ini
-# Log level
-Environment=LOG_LEVEL=DEBUG
-
-# Log format (see Python logging docs)
-Environment=LOG_FORMAT="%(asctime)s | %(levelname)s | %(name)s | %(message)s"
-
-# Log directory
-Environment=LOG_DIR="/var/log/zello_bridge"
-
-# RX audio gain in dB
-Environment=USRP_GAIN_RX_DB=0
-
-# TX audio gain in dB
-Environment=USRP_GAIN_TX_DB=0
+ZELLO_PRIVATE_KEY=/opt/Zello_Bridge/zello.key
+ZELLO_ISSUER_ID=/opt/Zello_Bridge/zello.id
+ZELLO_WS_ENDPOINT=wss://zello.io/ws
 ```
 
 ### Enable and Start Service
 
 ```bash
+sudo systemctl daemon-reload
 sudo systemctl enable zello_bridge
 sudo systemctl start zello_bridge
 ```
@@ -356,7 +286,7 @@ This also works with `docker-compose`, Kubernetes, or any container runtime.
 
 ## Credits
 
-`zello_bridge` is built and maintained by [Matt G4IYT](https://www.qrz.com/db/G4IYT), enhanced by [Hafizi 9W2LGX](https://www.qrz.com/db/9W2LGX)
+`zello_bridge` is built and maintained by [Matt G4IYT](https://www.qrz.com/db/G4IYT), enhanced by [Hafizi 9M2FZY](https://www.qrz.com/db/9M2FZY)
 
 Special thanks to:
 
