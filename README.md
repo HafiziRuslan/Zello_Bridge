@@ -102,6 +102,12 @@ The service file is configured to load environment variables from a `.env` file.
 ### Create .env File
 
 ```bash
+sudo cp .env.sample .env
+```
+
+or
+
+```bash
 sudo nano /opt/Zello_Bridge/.env
 ```
 
