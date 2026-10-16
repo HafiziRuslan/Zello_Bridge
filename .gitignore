@@ -1,5 +1,27 @@
-# Created by https://www.toptal.com/developers/gitignore/api/linux,macos,pydev,python,pythonvanilla,visualstudiocode,windows
-# Edit at https://www.toptal.com/developers/gitignore?templates=linux,macos,pydev,python,pythonvanilla,visualstudiocode,windows
+# Created by https://www.toptal.com/developers/gitignore/api/venv,linux,macos,pydev,direnv,dotenv,python,windows,virtualenv,pythonvanilla,visualstudiocode,git
+# Edit at https://www.toptal.com/developers/gitignore?templates=venv,linux,macos,pydev,direnv,dotenv,python,windows,virtualenv,pythonvanilla,visualstudiocode,git
+
+### direnv ###
+.direnv
+.envrc
+
+### dotenv ###
+.env
+
+### Git ###
+# Created by git for backups. To disable backups in Git:
+# $ git config --global mergetool.keepBackup false
+*.orig
+
+# Created by git when using merge tools for conflicts
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+*_BACKUP_*.txt
+*_BASE_*.txt
+*_LOCAL_*.txt
+*_REMOTE_*.txt
 
 ### Linux ###
 *~
@@ -140,7 +162,7 @@ ipython_config.py
 # pyenv
 #   For a library or package, you might want to ignore these files since the code is
 #   intended to run in multiple environments; otherwise, check them in:
-# .python-version
+.python-version
 
 # pipenv
 #   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
@@ -175,7 +197,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -251,6 +272,22 @@ pyrightconfig.json
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 
 
+### venv ###
+# Virtualenv
+# http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+pip-selfcheck.json
+
+### VirtualEnv ###
+# Virtualenv
+# http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
@@ -296,12 +333,11 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/linux,macos,pydev,python,pythonvanilla,visualstudiocode,windows
+# End of https://www.toptal.com/developers/gitignore/api/venv,linux,macos,pydev,direnv,dotenv,python,windows,virtualenv,pythonvanilla,visualstudiocode,git
+
+# Added by ggshield
+.cache_ggshield
 
 *.key
 *.id
 */zello_bridge.egg-info
-.python-version
-
-# Added by ggshield
-.cache_ggshield
