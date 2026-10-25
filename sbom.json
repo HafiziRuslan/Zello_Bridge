@@ -2,14 +2,14 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
   "version": 1,
-  "serialNumber": "urn:uuid:d0b6f83d-020b-4cb8-8dc5-46e3a58a43c8",
+  "serialNumber": "urn:uuid:06e783c8-5334-43fd-8c35-d91b19124eec",
   "metadata": {
-    "timestamp": "2026-10-16T10:54:14.831611600Z",
+    "timestamp": "2026-10-24T20:46:43.171261800Z",
     "tools": [
       {
         "vendor": "Astral Software Inc.",
         "name": "uv",
-        "version": "0.13.1"
+        "version": "0.13.5"
       }
     ],
     "component": {
@@ -90,10 +90,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "multidict-10@7.1.0",
+      "bom-ref": "multidict-10@7.2.1",
       "name": "multidict",
-      "version": "7.1.0",
-      "purl": "pkg:pypi/multidict@7.1.0"
+      "version": "7.2.1",
+      "purl": "pkg:pypi/multidict@7.2.1"
     },
     {
       "type": "library",
@@ -104,10 +104,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "pycparser-12@3.11",
+      "bom-ref": "pycparser-12@3.12",
       "name": "pycparser",
-      "version": "3.11",
-      "purl": "pkg:pypi/pycparser@3.11",
+      "version": "3.12",
+      "purl": "pkg:pypi/pycparser@3.12",
       "properties": [
         {
           "name": "uv:package:marker",
@@ -161,7 +161,7 @@
         "aiosignal-4@1.4.0",
         "attrs-5@26.1.0",
         "frozenlist-8@1.8.0",
-        "multidict-10@7.1.0",
+        "multidict-10@7.2.1",
         "propcache-11@0.5.4",
         "typing-extensions-15@4.16.0",
         "yarl-16@1.25.1"
@@ -180,7 +180,7 @@
     {
       "ref": "cffi-6@2.1.1",
       "dependsOn": [
-        "pycparser-12@3.11"
+        "pycparser-12@3.12"
       ]
     },
     {
@@ -196,13 +196,13 @@
       "ref": "idna-9@3.20"
     },
     {
-      "ref": "multidict-10@7.1.0"
+      "ref": "multidict-10@7.2.1"
     },
     {
       "ref": "propcache-11@0.5.4"
     },
     {
-      "ref": "pycparser-12@3.11"
+      "ref": "pycparser-12@3.12"
     },
     {
       "ref": "pyjwt-13@2.15.1"
@@ -217,7 +217,7 @@
       "ref": "yarl-16@1.25.1",
       "dependsOn": [
         "idna-9@3.20",
-        "multidict-10@7.1.0",
+        "multidict-10@7.2.1",
         "propcache-11@0.5.4"
       ]
     },

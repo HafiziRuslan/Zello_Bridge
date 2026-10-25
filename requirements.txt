@@ -17,7 +17,7 @@ frozenlist==1.8.0
     #   aiosignal
 idna==3.20
     # via yarl
-multidict==7.1.0
+multidict==7.2.1
     # via
     #   aiohttp
     #   yarl
@@ -25,7 +25,7 @@ propcache==0.5.4
     # via
     #   aiohttp
     #   yarl
-pycparser==3.11 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
+pycparser==3.12 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
     # via cffi
 pyjwt==2.15.1
     # via zello-bridge
