@@ -22,7 +22,6 @@ Latency vs. completeness trade-off (chosen by this implementation):
 """
 
 import os
-import time
 
 FRAME_BYTES = 320  # 20ms slin 8kHz 16-bit mono
 FRAME_INTERVAL_S = 0.02
@@ -52,8 +51,7 @@ class PlayoutPolicy:
 		self.target_bytes = _ms_to_bytes(_env('JITTER_TARGET_MS', 250))
 		self.max_latency_bytes = _ms_to_bytes(_env('JITTER_MAX_LATENCY_MS', 2000))
 		self.tail_drain_bytes = _ms_to_bytes(_env('JITTER_TAIL_DRAIN_MS', 1200))
-		if self.max_latency_bytes < self.target_bytes:
-			self.max_latency_bytes = self.target_bytes
+		self.max_latency_bytes = max(self.max_latency_bytes, self.target_bytes)
 		self.reset_message()
 
 	# ------------------------------------------------------------------ life cycle

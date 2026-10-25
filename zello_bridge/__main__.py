@@ -2,9 +2,10 @@ import asyncio
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-from .zello import ZelloController
-from .usrp import USRPController
+
 from .stream import AsyncByteStream
+from .usrp import USRPController
+from .zello import ZelloController
 
 log_level = os.environ.get('LOG_LEVEL', 'INFO').upper()
 log_format = os.environ.get('LOG_FORMAT', '%(asctime)s | %(levelname)s | %(name)s | %(message)s')

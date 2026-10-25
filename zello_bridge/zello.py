@@ -1,16 +1,19 @@
-import aiohttp
 import asyncio
 import base64
+from datetime import datetime
+from datetime import timedelta
 import json
 import logging
 import os
 import socket
 import struct
-import jwt
 import time
-from datetime import datetime, timedelta, timezone
+
+import aiohttp
+import jwt
 from pyogg.opus_decoder import OpusDecoder
 from pyogg.opus_encoder import OpusEncoder
+
 from .stream import AsyncByteStream
 
 AUTH_TOKEN_EXPIRY = 3600
@@ -125,7 +128,7 @@ class ZelloController:
 		return self._issuer_id
 
 	def get_token_free(self):
-		expiry = datetime.now(datetime.UTC) + timedelta(seconds=AUTH_TOKEN_EXPIRY)
+		expiry = datetime.datetime.now(datetime.UTC) + timedelta(seconds=AUTH_TOKEN_EXPIRY)
 		key = self.load_private_key()
 		if key is None:
 			self._logger.error('Cannot generate Zello Free token: Private key is missing.')
@@ -157,7 +160,7 @@ class ZelloController:
 		return data
 
 	def _debug_skip(self, reason):
-		now = datetime.now(datetime.UTC)
+		now = datetime.datetime.now(datetime.UTC)
 		if self._last_skip_reason != reason or self._last_skip_reason_at is None or (now - self._last_skip_reason_at).total_seconds() >= 2:
 			if self._logger.isEnabledFor(logging.DEBUG):
 				self._logger.debug(f'TX skip: {reason}')
@@ -261,7 +264,7 @@ class ZelloController:
 		self._logger.info('Monitor task starting')
 		try:
 			while not self._shutdown:
-				now_dt = datetime.now(datetime.UTC)
+				now_dt = datetime.datetime.now(datetime.UTC)
 				if self._ws is None:
 					await asyncio.sleep(1)
 					continue
@@ -269,12 +272,11 @@ class ZelloController:
 					await asyncio.sleep(1)
 					# auth watchdog even if token unknown
 				# auth watchdog
-				if self._auth_in_progress and self._auth_started_at is not None:
-					if (time.monotonic() - self._auth_started_at) > AUTH_WATCHDOG_SEC:
-						self._logger.warning('Auth watchdog tripped; clearing auth_in_progress')
-						self._auth_in_progress = False
-						self._auth_started_at = None
-						self._auth_seq = None
+				if self._auth_in_progress and self._auth_started_at is not None and (time.monotonic() - self._auth_started_at) > AUTH_WATCHDOG_SEC:
+					self._logger.warning('Auth watchdog tripped; clearing auth_in_progress')
+					self._auth_in_progress = False
+					self._auth_started_at = None
+					self._auth_seq = None
 				if self._token_expiry is not None:
 					time_until_expiry = self._token_expiry - now_dt
 					if time_until_expiry.total_seconds() <= AUTH_TOKEN_EXPIRY_THRESHOLD and not self._txing:
@@ -297,7 +299,7 @@ class ZelloController:
 	async def start_tx(self):
 		if self._ws is None or self._ws.closed:
 			return
-		now = datetime.now(datetime.UTC)
+		now = datetime.datetime.now(datetime.UTC)
 		if self._auth_in_progress:
 			self._debug_skip('auth in progress')
 			return
@@ -347,7 +349,7 @@ class ZelloController:
 				self._logger.error('Failed to get stream_id within timeout')
 				if self._logger.isEnabledFor(logging.DEBUG):
 					self._logger.debug('Timed out waiting for stream_id')
-				self._start_retry_after = datetime.now(datetime.UTC) + timedelta(seconds=CHANNEL_NOT_READY_BACKOFF_SEC)
+				self._start_retry_after = datetime.datetime.now(datetime.UTC) + timedelta(seconds=CHANNEL_NOT_READY_BACKOFF_SEC)
 				return
 			self._txing = True
 			self._pkt_id = 0
@@ -411,14 +413,13 @@ class ZelloController:
 		try:
 			while not self._shutdown:
 				await asyncio.sleep(MAIN_LOOP_YIELD_SEC)
-				now = datetime.now(datetime.UTC)
+				now = datetime.datetime.now(datetime.UTC)
 				# auth watchdog here too for extra safety
-				if self._auth_in_progress and self._auth_started_at is not None:
-					if (time.monotonic() - self._auth_started_at) > AUTH_WATCHDOG_SEC:
-						self._logger.warning('Auth watchdog (TX loop) tripped; clearing auth_in_progress')
-						self._auth_in_progress = False
-						self._auth_started_at = None
-						self._auth_seq = None
+				if self._auth_in_progress and self._auth_started_at is not None and (time.monotonic() - self._auth_started_at) > AUTH_WATCHDOG_SEC:
+					self._logger.warning('Auth watchdog (TX loop) tripped; clearing auth_in_progress')
+					self._auth_in_progress = False
+					self._auth_started_at = None
+					self._auth_seq = None
 				if self._ws is None or self._ws.closed:
 					await asyncio.sleep(0.5)
 					continue
@@ -462,12 +463,12 @@ class ZelloController:
 							self._logger.info('Keyed:USRP')
 							if self._logger.isEnabledFor(logging.DEBUG):
 								self._logger.debug(f'USRP PTT down at {self._ptt_down_at}')
-						if (datetime.now(datetime.UTC) - self._ptt_down_at).total_seconds() < 0.15:
+						if (datetime.datetime.now(datetime.UTC) - self._ptt_down_at).total_seconds() < 0.15:
 							await asyncio.sleep(0.01)
 							continue
 					try:
 						pcm = await asyncio.wait_for(self._stream_in.read(640), timeout=1)
-					except asyncio.TimeoutError:
+					except TimeoutError:
 						self._stat_read_timeouts += 1
 						self._debug_skip('stream_in read timeout')
 						pcm = []
@@ -508,7 +509,7 @@ class ZelloController:
 						continue
 					if not first_pcm_logged and self._ptt_down_at:
 						if self._logger.isEnabledFor(logging.DEBUG):
-							latency_ms = (datetime.now(datetime.UTC) - self._ptt_down_at).total_seconds() * 1000.0
+							latency_ms = (datetime.datetime.now(datetime.UTC) - self._ptt_down_at).total_seconds() * 1000.0
 							self._logger.debug(f'First PCM after PTT: {latency_ms:.1f} ms (len={len(pcm)})')
 						first_pcm_logged = True
 					if not sending:
@@ -541,7 +542,7 @@ class ZelloController:
 						sending = False
 						first_pcm_logged = False
 						await self._end_tx()
-				except asyncio.TimeoutError:
+				except TimeoutError:
 					pcm = []
 					if sending:
 						await self._end_tx()
@@ -621,10 +622,10 @@ class ZelloController:
 										elif data.get('error') == 'woodpecker prohibited':
 											self._logger.warning(f'Woodpecker protection triggered: {self._redact(data)}')
 											backoff = 3
-											if self._woodpecker_until and datetime.now(datetime.UTC) < self._woodpecker_until:
-												prev = (self._woodpecker_until - datetime.now(datetime.UTC)).seconds
+											if self._woodpecker_until and datetime.datetime.now(datetime.UTC) < self._woodpecker_until:
+												prev = (self._woodpecker_until - datetime.datetime.now(datetime.UTC)).seconds
 												backoff = min(8, prev * 2)
-											self._woodpecker_until = datetime.now(datetime.UTC) + timedelta(seconds=backoff)
+											self._woodpecker_until = datetime.datetime.now(datetime.UTC) + timedelta(seconds=backoff)
 											if self._logger.isEnabledFor(logging.DEBUG):
 												self._logger.debug(f'Applying woodpecker backoff until {self._woodpecker_until}')
 											if self._txing:
@@ -632,12 +633,12 @@ class ZelloController:
 											continue
 										elif data.get('error') == 'empty message':
 											self._logger.warning(f'Server error: {self._redact(data)}')
-											if self._empty_msg_backoff_until and datetime.now(datetime.UTC) < self._empty_msg_backoff_until:
-												prev = (self._empty_msg_backoff_until - datetime.now(datetime.UTC)).seconds
+											if self._empty_msg_backoff_until and datetime.datetime.now(datetime.UTC) < self._empty_msg_backoff_until:
+												prev = (self._empty_msg_backoff_until - datetime.datetime.now(datetime.UTC)).seconds
 												backoff = min(8, prev * 2)
 											else:
 												backoff = 1
-											self._empty_msg_backoff_until = datetime.now(datetime.UTC) + timedelta(seconds=backoff)
+											self._empty_msg_backoff_until = datetime.datetime.now(datetime.UTC) + timedelta(seconds=backoff)
 											if self._logger.isEnabledFor(logging.DEBUG):
 												self._logger.debug(f'Applying empty-message backoff until {self._empty_msg_backoff_until}')
 											if self._txing:
@@ -648,7 +649,7 @@ class ZelloController:
 											self._logger.warning(f'Channel not ready (seq={seq})')
 											self._stat_channel_not_ready += 1
 											self._channel_ready = False
-											self._channel_backoff_until = datetime.now(datetime.UTC) + timedelta(seconds=CHANNEL_NOT_READY_BACKOFF_SEC)
+											self._channel_backoff_until = datetime.datetime.now(datetime.UTC) + timedelta(seconds=CHANNEL_NOT_READY_BACKOFF_SEC)
 											self._start_retry_after = self._channel_backoff_until
 											if self._logger.isEnabledFor(logging.DEBUG):
 												self._logger.debug(f'Channel backoff until {self._channel_backoff_until}')
@@ -660,7 +661,7 @@ class ZelloController:
 										if data['command'] == 'on_stream_start':
 											user = data.get('from') or data.get('user') or data.get('username') or data.get('display_name')
 											self._talk_user = user
-											self._talk_start = datetime.now(datetime.UTC)
+											self._talk_start = datetime.datetime.now(datetime.UTC)
 											if self._logger.isEnabledFor(logging.DEBUG):
 												self._logger.debug(f'Talk user set: {self._talk_user}')
 											if user:
@@ -669,7 +670,7 @@ class ZelloController:
 												self._logger.info('Keyed:Unknown')
 											self._zello_ptt.set()
 										elif data['command'] == 'on_stream_stop':
-											now_dt = datetime.now(datetime.UTC)
+											now_dt = datetime.datetime.now(datetime.UTC)
 											dur = None
 											if self._talk_start is not None:
 												dur = (now_dt - self._talk_start).total_seconds()
@@ -698,7 +699,7 @@ class ZelloController:
 											self._auth_in_progress = False
 											self._auth_started_at = None
 											self._auth_seq = None
-											self._last_login_at = datetime.now(datetime.UTC)
+											self._last_login_at = datetime.datetime.now(datetime.UTC)
 											self._start_retry_after = None
 											if self._logger.isEnabledFor(logging.DEBUG):
 												self._logger.debug('Authentication success event received (seq match)')
@@ -716,7 +717,7 @@ class ZelloController:
 											self._auth_in_progress = False
 											self._auth_started_at = None
 											self._auth_seq = None
-											self._last_login_at = datetime.now(datetime.UTC)
+											self._last_login_at = datetime.datetime.now(datetime.UTC)
 											self._start_retry_after = None
 											try:
 												exp = jwt.decode(self._refresh_token, options={'verify_signature': False}).get('exp')
@@ -749,7 +750,7 @@ class ZelloController:
 						self._logger.warning(f'Connection error: {e}')
 						if self._logger.isEnabledFor(logging.DEBUG):
 							self._logger.debug('Network hint: DNS/connection issue; will retry in 5s')
-					except asyncio.TimeoutError:
+					except TimeoutError:
 						self._logger.warning('Authentication timeout')
 					except Exception as e:
 						self._logger.error(f'WebSocket error: {e}')
