@@ -31,6 +31,7 @@ The bridge does not require significant resources. The FreeSTAR bridge runs on a
 * [Setup Service](#setup-service)
   * [Create .env File](#create-env-file)
   * [Enable and Start Service](#enable-and-start-service)
+  * [Updating](#updating)
 * [AllStarLink Setup](#allstarlink-setup)
   * [Configure `rpt.conf`](#configure-rptconf)
   * [`privatenodes.txt` (Supermon/AllScan)](#privatenodestxt-supermonallscan)
@@ -136,7 +137,7 @@ sudo systemctl enable zello_bridge
 sudo systemctl start zello_bridge
 ```
 
-## Updating
+### Updating
 
 To update the bridge to the latest version and clean the environment:
 
